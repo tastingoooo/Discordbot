@@ -1,0 +1,102 @@
+{
+  "weapon": [
+    {
+      "name": "大劍",
+      "skill": [
+        { "skillName": "真．蓄力斬", "ratio": 1.2, "hit": 1 },
+        { "skillName": "橫掃斬", "ratio": 0.8, "hit": 1 }
+      ]
+    },
+    {
+      "name": "長槍",
+      "skill": [
+        { "skillName": "鐵錨狂怒", "ratio": 1.0, "hit": 1 },
+        { "skillName": "流轉突刺", "ratio": 0.85, "hit": 1 }
+      ]
+    },
+    {
+      "name": "斬擊斧",
+      "skill": [
+        { "skillName": "[斧模式]變形二連斬", "ratio": 0.53, "hit": 2 },
+        { "skillName": "[劍模式]屬性解放突刺", "ratio": 1.14, "hit": 1 }
+      ]
+    },
+    {
+      "name": "操蟲棍",
+      "skill": [
+        { "skillName": "強化袈裟斬", "ratio": 0.83, "hit": 1 },
+        { "skillName": "四連印斬", "ratio": 0.23, "hit": 4 }
+      ]
+    },
+    {
+      "name": "重弩",
+      "skill": [
+        { "skillName": "蓄力射擊", "ratio": 1.11, "hit": 1 },
+        { "skillName": "射擊機關･狙擊龍彈", "ratio": 1.2, "hit": 1 }
+      ]
+    },
+    {
+      "name": "輕弩",
+      "skill": [
+        { "skillName": "射擊", "ratio": 0.85, "hit": 1 },
+        { "skillName": "起爆龍彈", "ratio": 0.51, "hit": 2 }
+      ]
+    },
+    {
+      "name": "太刀",
+      "skill": [
+        { "skillName": "氣刃兜割", "ratio": 1.19, "hit": 1 },
+        { "skillName": "威合", "ratio": 0.4, "hit": 3 }
+      ]
+    },
+    {
+      "name": "單手劍",
+      "skill": [
+        { "skillName": "滅･昇龍擊", "ratio": 1.13, "hit": 1 },
+        { "skillName": "風車", "ratio": 0.41, "hit": 2 }
+      ]
+    },
+    {
+      "name": "銃槍",
+      "skill": [
+        { "skillName": "鐵壁尖槍", "ratio": 0.82, "hit": 1 },
+        { "skillName": "龍擊砲", "ratio": 1.05, "hit": 1 }
+      ]
+    },
+    {
+      "name": "充能斧",
+      "skill": [
+        { "skillName": "[劍模式]高壓屬性斬", "ratio": 1.08, "hit": 1 },
+        { "skillName": "[斧模式]超高輸出屬性解放斬", "ratio": 1.15, "hit": 1 }
+      ]
+    },
+    {
+      "name": "大錘",
+      "skill": [
+        { "skillName": "流星穿地擊", "ratio": 1.18, "hit": 1 },
+        { "skillName": "鐵蟲迴轉攻擊", "ratio": 0.25, "hit": 4 }
+      ]
+    },
+    {
+      "name": "狩獵笛",
+      "skill": [
+        { "skillName": "震打", "ratio": 0.35, "hit": 3 },
+        { "skillName": "共鳴音珠", "ratio": 0.89, "hit": 1 }
+      ]
+    },
+    {
+      "name": "弓",
+      "skill": [
+        { "skillName": "飛翔凝視射擊", "ratio": 1.19, "hit": 1 },
+        { "skillName": "剛射", "ratio": 0.23, "hit": 5 }
+      ]
+    },
+    {
+      "name": "雙劍",
+      "skill": [
+        { "skillName": "鬼人突進連斬", "ratio": 0.38, "hit": 3 },
+        { "skillName": "鬼人六連斬", "ratio": 0.19, "hit": 6 }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+require("dotenv").config();
+const weapon = require("./weapon.json");
 const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
 const client = new Client({
   intents: [
@@ -8,8 +10,6 @@ const client = new Client({
 });
 const settings = require("./settings.json");
 const fs = require("fs");
-const { default: Collection } = require("@discordjs/collection");
-
 client.on("ready", () => {
   console.log(`${client.user.tag} 逼..逼逼...機油好難喝...`);
 });
@@ -17,7 +17,7 @@ client.on("ready", () => {
 client.on("messageCreate", (msg) => {
   if (msg.content.startsWith(settings.prefix + "help")) {
     msg.channel.send(
-      "目前指令：\n#抽卡機率\n#抽卡 [內容]\n#單抽 [內容]\n#晚餐\n#天氣 [城市]\n#地震"
+      "目前指令：\n#抽卡機率\n#抽卡 [內容]\n#單抽 [內容]\n#晚餐\n#天氣 [城市(要完全符合)]\n#地震 [數字(前幾筆)]"
     );
   }
   if (msg.content.startsWith(settings.prefix + "抽卡機率")) {
@@ -45,7 +45,11 @@ client.on("messageCreate", (msg) => {
       }
     });
   }
-  if (msg.content.startsWith(settings.prefix + "抽卡")) {
+  if (
+    (msg.content.includes(/* settings.prefix + */ "抽") &&
+      msg.content.includes(/* settings.prefix + */ "卡")) ||
+    msg.content.includes("<@374895686233227265>") //冠廷
+  ) {
     if (msg.author.bot)
       //過濾機器人的話
       return;
@@ -104,12 +108,12 @@ client.on("messageCreate", (msg) => {
       msg.channel.send("牛逼"); //單抽非R跟SR
     }
   }
-  if (msg.content.startsWith(settings.prefix + "天氣")) {
+  if (msg.content.startsWith(settings.prefix + "weather")) {
     if (msg.author.bot) return; //過濾機器人的話
-    let city = msg.content.replace("#天氣 ", ""); //將使用者的話轉成城市
-    const KEY = "f2fdf3e0e00fc060f2295b4e4328c27d";
+    let city = msg.content.replace("#weather ", ""); //將使用者的話轉成城市
+    const KEY = process.env.OpenWeatherKEY;
 
-    async function getWeather() {
+    async function getOpenWeather() {
       let weather = await fetch(
         "https://api.openweathermap.org/data/2.5/forecast?q=" +
           city +
@@ -118,18 +122,10 @@ client.on("messageCreate", (msg) => {
           "&lang=zh_tw&units=metric"
       );
       let weatherjson = await weather.json();
-      for (i = 1; i <= 3; i++) {
+      for (i = 2; i <= 4; i++) {
         const exampleEmbed = new EmbedBuilder()
           .setColor(0x0099ff)
           .setTitle(weatherjson.city.name)
-          /* .setURL("https://discord.js.org/") */ //可以在標題上放網址
-          /* .setAuthor({//這裡可以設置作者
-        name: "Some name",
-        iconURL: "https://i.imgur.com/AfFp7pu.png",
-        url: "https://discord.js.org",
-      }) */ /* 
-      .setDescription("Some description here")
-      .setThumbnail("https://i.imgur.com/AfFp7pu.png") */ //可以放右上圖片
           .addFields(
             {
               name: "天氣",
@@ -146,7 +142,6 @@ client.on("messageCreate", (msg) => {
               value: weatherjson.list[i].main.feels_like + "°C",
               inline: true,
             }
-            //{ name: "\u200B", value: "\u200B" } //類似空格的存在
           )
           .addFields(
             {
@@ -166,34 +161,166 @@ client.on("messageCreate", (msg) => {
             }
           )
           .setDescription(weatherjson.list[i].dt_txt);
-        /* .setImage("https://i.imgur.com/AfFp7pu.png") */ //放大的圖片;
+
+        msg.channel.send({ embeds: [exampleEmbed] });
+      }
+    }
+    getOpenWeather();
+  }
+  if (msg.content.startsWith(settings.prefix + "地震")) {
+    if (msg.author.bot) return; //過濾機器人的話
+    let number = msg.content.replace("#地震", "");
+    number = number.replace(" ", "");
+    let i = number ? number : 0;
+    const KEY = process.env.OpenDataKEY;
+    const url =
+      "https://opendata.cwb.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=" +
+      KEY +
+      "&format=JSON";
+    async function getEarthquake() {
+      let earthquake = await fetch(url);
+      let earthquakejson = await earthquake.json();
+
+      const exampleEmbed = new EmbedBuilder()
+        .setColor(0x696969)
+        .setTitle("地震報告")
+        .setURL(earthquakejson.records.Earthquake[i].Web)
+        .setDescription(earthquakejson.records.Earthquake[i].ReportContent)
+        .setImage(earthquakejson.records.Earthquake[i].ReportImageURI);
+
+      msg.channel.send({ embeds: [exampleEmbed] });
+    }
+    getEarthquake();
+  }
+  if (msg.content.startsWith(settings.prefix + "天氣")) {
+    if (msg.author.bot) return; //過濾機器人的話
+    let city = msg.content.replace("#天氣 ", ""); //將使用者的話轉成城市
+    const KEY = process.env.OpenDataKEY;
+
+    async function getWeather() {
+      let weather = await fetch(
+        "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=" +
+          KEY +
+          "&locationName=" +
+          city
+      );
+      let weatherjson = await weather.json();
+      for (i = 0; i <= 2; i++) {
+        const exampleEmbed = new EmbedBuilder()
+          .setColor(0x0099ff)
+          .setTitle(weatherjson.records.location[0].locationName)
+          .addFields(
+            {
+              name: "天氣",
+              value:
+                weatherjson.records.location[0].weatherElement[0].time[i]
+                  .parameter.parameterName,
+              inline: true,
+            },
+            {
+              name: "溫度",
+              value:
+                weatherjson.records.location[0].weatherElement[2].time[i]
+                  .parameter.parameterName +
+                "~" +
+                weatherjson.records.location[0].weatherElement[4].time[i]
+                  .parameter.parameterName +
+                "°C",
+              inline: true,
+            },
+            {
+              name: "降雨機率",
+              value:
+                weatherjson.records.location[0].weatherElement[1].time[i]
+                  .parameter.parameterName + "%",
+              inline: true,
+            }
+          )
+          .setDescription(
+            weatherjson.records.location[0].weatherElement[0].time[i].startTime
+          );
 
         msg.channel.send({ embeds: [exampleEmbed] });
       }
     }
     getWeather();
   }
-  if (msg.content.startsWith(settings.prefix + "地震")) {
+  if (msg.content.startsWith(settings.prefix + "時間")) {
     if (msg.author.bot) return; //過濾機器人的話
-    const KEY = "CWB-74ABA257-63B3-4FED-962F-08CE3ADF83D7";
-    const url =
-      "https://opendata.cwb.gov.tw/api/v1/rest/datastore/E-A0015-001?Authorization=" +
-      KEY +
-      "&limit=1&format=JSON";
-    async function getEarthquake(city) {
-      let earthquake = await fetch(url);
-      let earthquakejson = await earthquake.json();
-
-      const exampleEmbed = new EmbedBuilder()
-        .setColor(0x0099ff)
-        .setTitle("地震報告")
-        .setURL(earthquakejson.records.earthquake[0].web)
-        .setDescription(earthquakejson.records.earthquake[0].reportContent)
-        .setImage(earthquakejson.records.earthquake[0].reportImageURI);
-
-      msg.channel.send({ embeds: [exampleEmbed] });
+    let value = msg.content.replace("#時間 ", ""); //將使用者的話轉成城市
+  }
+  if (msg.content.startsWith(settings.prefix + "對決")) {
+    equipment = weapon.weapon.length;
+    battle(
+      weapon.weapon[Math.floor(Math.random() * equipment)],
+      weapon.weapon[Math.floor(Math.random() * equipment)]
+    );
+    function battle(player1, player2) {
+      //初始化數值
+      let sw = msg.content.replace("#對決 ", "");
+      sw = sw == "#對決" ? "bot" : sw;
+      let name = ["<@" + msg.author.id + ">", sw];
+      let turn = 0;
+      let health1 = 1000;
+      let health2 = 1000;
+      let str = "";
+      //先後手
+      let dice1 = Math.floor(Math.random() * 100);
+      let dice2 = Math.floor(Math.random() * 100);
+      str += "--------------前置--------------\n";
+      str += name[0] + `骰出了${dice1}點。\n`;
+      str += name[1] + `骰出了${dice2}點。\n`;
+      let temp =
+        dice1 >= dice2 ? `${name[0]}先手！\n\n` : `${name[1]}先手！\n\n`;
+      name = dice1 >= dice2 ? ["[我方]", "[敵方]"] : ["[敵方]", "[我方]"];
+      //抽取武器
+      str += temp;
+      str += name[0] + `抽到了${player1.name}\n`;
+      str += name[1] + `抽到了${player2.name}\n`;
+      str += "------------前置結束------------\n";
+      str += "```\n";
+      //輪流攻擊，死了就跳出
+      while (health1 > 0 && health2 > 0) {
+        health2 = attack(player1, health2);
+        if (health2 <= 0) break;
+        health1 = attack(player2, health1);
+      }
+      str += "60秒後返回營地‧‧‧\n";
+      str += "```";
+      msg.channel.send(str);
+      //就隨機傷害
+      function damage() {
+        let rnd = Math.floor(Math.random() * 290) + 10;
+        return rnd;
+      }
+      function attack(player, health) {
+        let total = "";
+        let skillRandom = Math.floor(Math.random() * player.skill.length);
+        //打幾下就跑幾次
+        for (let i = 0; i < player.skill[skillRandom].hit; i++) {
+          if (health <= 0) break;
+          let temp;
+          //把隨機傷害*係數取整數
+          temp = Math.floor(damage() * player.skill[skillRandom].ratio);
+          //將string加上去
+          total = total == "" ? total + temp : total + "、" + temp;
+          health = health - temp;
+        }
+        str +=
+          name[turn % 2] +
+          "使用了***" +
+          player.skill[skillRandom].skillName +
+          `***，造成了${total}點傷害。\n`;
+        if (health > 0) {
+          str += name[(turn + 1) % 2] + `剩下${health}滴血！\n`;
+        } else {
+          str += name[(turn + 1) % 2] + `貓車！\n\n`;
+        }
+        turn++;
+        if (health <= 0) return health;
+        return health;
+      }
     }
-    getEarthquake();
   }
 });
 
