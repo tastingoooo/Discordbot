@@ -1,6 +1,11 @@
 require("dotenv").config();
 const weapon = require("./weapon.json");
-const { Client, GatewayIntentBits, EmbedBuilder } = require("discord.js");
+const {
+  Client,
+  GatewayIntentBits,
+  EmbedBuilder,
+  SlashCommandBuilder,
+} = require("discord.js");
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -46,9 +51,8 @@ client.on("messageCreate", (msg) => {
     });
   }
   if (
-    (msg.content.includes(/* settings.prefix + */ "抽") &&
-      msg.content.includes(/* settings.prefix + */ "卡")) ||
-    msg.content.includes("<@374895686233227265>") //冠廷
+    msg.content.includes(/* settings.prefix + */ "抽") &&
+    msg.content.includes(/* settings.prefix + */ "卡")
   ) {
     if (msg.author.bot)
       //過濾機器人的話
@@ -272,7 +276,13 @@ client.on("messageCreate", (msg) => {
       str += name[1] + `骰出了${dice2}點。\n`;
       let temp =
         dice1 >= dice2 ? `${name[0]}先手！\n\n` : `${name[1]}先手！\n\n`;
-      name = dice1 >= dice2 ? ["[我方]", "[敵方]"] : ["[敵方]", "[我方]"];
+      let nickName =
+        dice1 >= dice2 ? ["[我方]", "[敵方]"] : ["[敵方]", "[我方]"];
+      name =
+        dice1 >= dice2
+          ? ["<@" + msg.author.id + ">", sw]
+          : [sw, "<@" + msg.author.id + ">"];
+
       //抽取武器
       str += temp;
       str += name[0] + `抽到了${player1.name}\n`;
@@ -285,8 +295,10 @@ client.on("messageCreate", (msg) => {
         if (health2 <= 0) break;
         health1 = attack(player2, health1);
       }
-      str += "60秒後返回營地‧‧‧\n";
+      str += "\n60秒後返回營地‧‧‧";
       str += "```";
+      health1 < 0 ? (str += `${name[1]}勝利！`) : (str += `${name[0]}勝利！`);
+
       msg.channel.send(str);
       //就隨機傷害
       function damage() {
@@ -307,14 +319,14 @@ client.on("messageCreate", (msg) => {
           health = health - temp;
         }
         str +=
-          name[turn % 2] +
+          nickName[turn % 2] +
           "使用了***" +
           player.skill[skillRandom].skillName +
           `***，造成了${total}點傷害。\n`;
         if (health > 0) {
-          str += name[(turn + 1) % 2] + `剩下${health}滴血！\n`;
+          str += nickName[(turn + 1) % 2] + `剩下${health}滴血！\n`;
         } else {
-          str += name[(turn + 1) % 2] + `貓車！\n\n`;
+          str += nickName[(turn + 1) % 2] + `貓車！\n`;
         }
         turn++;
         if (health <= 0) return health;

@@ -1,6 +1,16 @@
 const weapon = require("./weapon.json");
 
-equipment = weapon.weapon.length;
+/* console.log(weapon);
+console.log(weapon.weapon[0].skill[0]); */
+async function getOpenWeather() {
+  let weather = await fetch(
+    "https://api.openweathermap.org/data/2.5/forecast?q=%E5%8F%B0%E4%B8%AD%E5%B8%82&appid=f2fdf3e0e00fc060f2295b4e4328c27d&lang=zh_tw&units=metric"
+  );
+  let weatherjson = await weather.json();
+  console.log(weatherjson);
+}
+getOpenWeather();
+/* equipment = weapon.weapon.length;
 battle(
   weapon.weapon[Math.floor(Math.random() * equipment)],
   weapon.weapon[Math.floor(Math.random() * equipment)]
@@ -63,3 +73,4 @@ function battle(player1, player2) {
     return health;
   }
 }
+ */
